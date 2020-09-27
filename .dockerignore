@@ -1,0 +1,8 @@
+*
+!.npmrc
+!src
+!package.json
+!package-lock.json
+!tsconfig.json
+
+src/**/.git
