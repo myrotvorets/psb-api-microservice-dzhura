@@ -27,4 +27,4 @@ ENTRYPOINT ["/usr/bin/node", "server.js"]
 COPY --chown=nobody:nogroup ./src/specs ./specs
 COPY --chown=nobody:nogroup --from=build /srv/service/dist/ ./
 COPY --chown=nobody:nogroup --from=deps /srv/service/node_modules ./node_modules
-RUN ls -lha ./
+
