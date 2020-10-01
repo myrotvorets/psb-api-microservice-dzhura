@@ -1,22 +1,22 @@
 import type { Config } from 'knex';
 import { cleanEnv, num, str } from 'envalid';
 
-const env = cleanEnv(
-    process.env,
-    {
-        NODE_ENV: str({ default: 'development' }),
-        MYSQL_DATABASE: str(),
-        MYSQL_HOST: str({ default: 'localhost' }),
-        MYSQL_USER: str({ default: '' }),
-        MYSQL_PASSWORD: str({ default: '' }),
-        MYSQL_CONN_LIMIT: num({ default: 2 }),
-    },
-    {
-        strict: true,
-    },
-);
-
 export function buildKnexConfig(): Config {
+    const env = cleanEnv(
+        process.env,
+        {
+            NODE_ENV: str({ default: 'development' }),
+            MYSQL_DATABASE: str(),
+            MYSQL_HOST: str({ default: 'localhost' }),
+            MYSQL_USER: str({ default: '' }),
+            MYSQL_PASSWORD: str({ default: '' }),
+            MYSQL_CONN_LIMIT: num({ default: 2 }),
+        },
+        {
+            strict: true,
+        },
+    );
+
     return {
         client: 'mysql2',
         asyncStackTraces: env.NODE_ENV === 'development',
@@ -37,8 +37,3 @@ export function buildKnexConfig(): Config {
         },
     };
 }
-
-module.exports = {
-    buildKnexConfig,
-    [env.NODE_ENV]: buildKnexConfig(),
-};

@@ -11,8 +11,8 @@ RUN npm ci --only=prod
 FROM base AS build
 RUN \
     npm r --package-lock-only \
-        eslint @myrotvorets/eslint-config-myrotvorets-ts @typescript-eslint/eslint-plugin eslint-plugin-import eslint-plugin-prettier \
-        @types/jest jest ts-jest merge \
+        eslint @myrotvorets/eslint-config-myrotvorets-ts @typescript-eslint/eslint-plugin eslint-plugin-import eslint-plugin-prettier prettier \
+        @types/jest jest ts-jest merge supertest @types/supertest \
         nodemon && \
     npm ci
 COPY --chown=nobody:nogroup ./src ./src

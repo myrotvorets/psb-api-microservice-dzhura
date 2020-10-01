@@ -84,16 +84,19 @@ export default class SearchService {
         return result;
     }
 
-    private static prepareName(s: string): string | null {
-        s = s.replace(/[^\p{L}]/gu, ' ');
-        s = s.replace(/\s+/gu, ' ').trim().toLowerCase();
+    protected static prepareName(s: string): string | null {
+        s = s
+            .replace(/[^\p{L}]/gu, ' ')
+            .replace(/\s+/gu, ' ')
+            .trim()
+            .toLowerCase();
 
         const parts: string[] = [...new Set(s.split(' '))];
         if (parts.length < 2) {
             return null;
         }
 
-        let name = `>"${s}"`;
+        let name = `>"${parts.join(' ')}"`;
         if (parts.length > 2) {
             name += ` "${parts[0]} ${parts[1]}"`;
         }

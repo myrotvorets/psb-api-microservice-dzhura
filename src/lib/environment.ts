@@ -7,8 +7,8 @@ export interface Environment {
 
 let environ: Environment | null = null;
 
-export function environment(dotEnvPath?: string | null): Environment {
-    if (!environ) {
+export function environment(reset = false): Environment {
+    if (!environ || reset) {
         environ = cleanEnv(
             process.env,
             {
@@ -17,7 +17,7 @@ export function environment(dotEnvPath?: string | null): Environment {
             },
             {
                 strict: true,
-                dotEnvPath,
+                dotEnvPath: null,
             },
         );
     }
