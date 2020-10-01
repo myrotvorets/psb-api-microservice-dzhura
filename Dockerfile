@@ -23,7 +23,7 @@ USER root
 WORKDIR /srv/service
 RUN chown nobody:nogroup /srv/service
 USER nobody:nogroup
-ENTRYPOINT ["/usr/bin/node", "server.js"]
+ENTRYPOINT ["/usr/bin/node", "index.js"]
 COPY --chown=nobody:nogroup ./src/specs ./specs
 COPY --chown=nobody:nogroup --from=build /srv/service/dist/ ./
 COPY --chown=nobody:nogroup --from=deps /srv/service/node_modules ./node_modules

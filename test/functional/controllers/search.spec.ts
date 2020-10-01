@@ -1,22 +1,24 @@
 import express from 'express';
 import request from 'supertest';
 import knex from 'knex';
+import mockKnex from 'mock-knex';
 import { buildKnexConfig } from '../../../src/knexfile';
 import { configureApp } from '../../../src/server';
+import { attachmentResponse, criminalResponse } from '../../fixtures/queryresponses';
+import { resultItems } from '../../fixtures/results';
 
-const env = { ...process.env };
 let app: express.Express;
-
-process.env = {
-    ...process.env,
-    MYSQL_DATABASE: 'fake',
-};
 
 async function buildApp(): Promise<express.Express> {
     const application = express();
-    await configureApp(application, knex(buildKnexConfig({ MYSQL_DATABASE: 'fake' })));
+    const db = knex(buildKnexConfig({ MYSQL_DATABASE: 'fake' }));
+    mockKnex.mock(db);
+    afterAll(() => mockKnex.unmock(db));
+    await configureApp(application, db);
     return application;
 }
+
+afterEach(() => mockKnex.getTracker().uninstall());
 
 beforeAll((done) => {
     buildApp()
@@ -27,10 +29,6 @@ beforeAll((done) => {
         .catch((e: Error) => {
             done.fail(e);
         });
-});
-
-afterAll(() => {
-    process.env = { ...env };
 });
 
 describe('SearchController', () => {
@@ -79,6 +77,38 @@ describe('SearchController', () => {
             ['options'],
         ])('should return a 405 on disallowed methods (%s)', (method) => {
             return request(app)[method]('/search').expect(405);
+        });
+    });
+
+    describe('Normal operation', () => {
+        it('should return the expected result', () => {
+            const tracker = mockKnex.getTracker();
+            tracker.on('query', (query, step) => {
+                switch (step) {
+                    case 1:
+                        expect(query.method).toBe('select');
+                        expect(query.bindings).toHaveLength(4);
+                        query.response(criminalResponse);
+                        break;
+
+                    case 2:
+                        expect(query.method).toBe('select');
+                        expect(query.bindings).toHaveLength(3);
+                        query.response(attachmentResponse);
+                        break;
+
+                    default:
+                        fail();
+                }
+            });
+
+            tracker.install();
+            const expected = {
+                success: true,
+                items: resultItems,
+            };
+
+            return request(app).get('/search?s=We%20will%20find%20everything').expect(200).expect(expected);
         });
     });
 });

@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 import type { Config } from 'knex';
 import { cleanEnv, num, str } from 'envalid';
 

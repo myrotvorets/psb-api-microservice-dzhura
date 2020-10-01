@@ -2,6 +2,8 @@ import mockKnex from 'mock-knex';
 import knex from 'knex';
 import SearchService, { CriminalAttachment } from '../../../src/services/search';
 import { buildKnexConfig } from '../../../src/knexfile';
+import { attachmentResponse, criminalResponse } from '../../fixtures/queryresponses';
+import { resultItems } from '../../fixtures/results';
 
 class MySearchService extends SearchService {
     public static testPrepareName(name: string): string | null {
@@ -126,41 +128,13 @@ describe('SearchService', () => {
                     case 1:
                         expect(query.method).toBe('select');
                         expect(query.bindings).toHaveLength(4);
-                        query.response([
-                            {
-                                id: 1,
-                                name: 'Путин Владимир Владимирович',
-                                nname: 'Путін Володимир Володимирович',
-                                slug: 'putin-vladimir-vladimirovich',
-                                description: 'Террорист №1',
-                                dob: '1952-10-07',
-                                country: 'Россия',
-                                address: 'Москва',
-                            },
-                            {
-                                id: 2,
-                                name: 'Сабо Виталий Валентинович',
-                                nname: 'Сабо Віталій Валентинович',
-                                slug: 'sabo-vitalij-valentinovich',
-                                description: 'Пособник российских оккупантов',
-                                dob: '0000-00-00',
-                                country: '',
-                                address: '',
-                            },
-                        ]);
+                        query.response(criminalResponse);
                         break;
 
                     case 2:
                         expect(query.method).toBe('select');
                         expect(query.bindings).toHaveLength(3);
-                        query.response([
-                            {
-                                id: 1,
-                                att_id: 3,
-                                path: 'criminals/00/37/41/1E76206_1.jpg',
-                                mime_type: 'image.jpeg',
-                            },
-                        ]);
+                        query.response(attachmentResponse);
                         break;
 
                     default:
@@ -169,27 +143,7 @@ describe('SearchService', () => {
             });
 
             tracker.install();
-            const expected = [
-                {
-                    id: 1,
-                    name: 'Путин Владимир Владимирович',
-                    nname: 'Путін Володимир Володимирович',
-                    link: 'https://myrotvorets.center/criminal/putin-vladimir-vladimirovich/',
-                    description: '<p>Террорист №1</p>\n',
-                    dob: '1952-10-07',
-                    country: 'Россия',
-                    address: 'Москва',
-                    thumbnail: 'https://psb4ukr.natocdn.net/criminals/00/37/41/1E76206_1-150x150.jpg',
-                },
-                {
-                    id: 2,
-                    name: 'Сабо Виталий Валентинович',
-                    nname: 'Сабо Віталій Валентинович',
-                    link: 'https://myrotvorets.center/criminal/sabo-vitalij-valentinovich/',
-                    description: '<p>Пособник российских оккупантов</p>\n',
-                },
-            ];
-
+            const expected = resultItems;
             return expect(service.search('Our mock will find everything')).resolves.toEqual(expected);
         });
     });
