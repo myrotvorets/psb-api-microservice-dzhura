@@ -81,33 +81,19 @@ describe('SearchController', () => {
     });
 
     describe('Normal operation', () => {
-        it('should return the expected result', () => {
+        it('should return the result in the expected format', () => {
             const tracker = mockKnex.getTracker();
             tracker.on('query', (query, step) => {
-                switch (step) {
-                    case 1:
-                        expect(query.method).toBe('select');
-                        expect(query.bindings).toHaveLength(4);
-                        query.response(criminalResponse);
-                        break;
-
-                    case 2:
-                        expect(query.method).toBe('select');
-                        expect(query.bindings).toHaveLength(3);
-                        query.response(attachmentResponse);
-                        break;
-
-                    default:
-                        fail();
-                }
+                const responses = [criminalResponse, attachmentResponse];
+                query.response(responses[step - 1] ?? fail());
             });
 
-            tracker.install();
             const expected = {
                 success: true,
                 items: resultItems,
             };
 
+            tracker.install();
             return request(app).get('/search?s=We%20will%20find%20everything').expect(200).expect(expected);
         });
     });
