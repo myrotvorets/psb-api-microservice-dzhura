@@ -9,7 +9,9 @@
     "start:dev": "nodemon -L",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "test": "NODE_ENV=test jest"
+    "pretest": "npm run lint",
+    "test": "NODE_ENV=test jest",
+    "posttest": "npm run build"
   },
   "keywords": [],
   "author": "Myrotvorets <support@myrotvorets.center> (https://myrotvorets.center/)",
