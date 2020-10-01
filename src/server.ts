@@ -11,12 +11,10 @@ import { environment } from './lib/environment';
 
 import searchController from './controllers/search';
 
-export async function configureApp(app: express.Express): Promise<void> {
+export async function configureApp(app: express.Express, db: knex): Promise<void> {
     const env = environment();
 
     await installOpenApiValidator(join(__dirname, 'specs', 'dzhura.yaml'), app, env.NODE_ENV);
-
-    const db = knex(buildKnexConfig());
 
     app.use('/', searchController(db));
     app.use('/', notFoundMiddleware);
@@ -42,7 +40,7 @@ export function setupApp(): express.Express {
 export async function run(): Promise<void> {
     const env = environment();
     const app = setupApp();
-    await configureApp(app);
+    await configureApp(app, knex(buildKnexConfig()));
 
     const server = await createServer(app);
     server.listen(env.PORT);

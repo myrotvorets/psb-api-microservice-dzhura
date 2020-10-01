@@ -1,5 +1,7 @@
 import express from 'express';
 import request from 'supertest';
+import knex from 'knex';
+import { buildKnexConfig } from '../../../src/knexfile';
 import { configureApp } from '../../../src/server';
 
 const env = { ...process.env };
@@ -12,7 +14,7 @@ process.env = {
 
 async function buildApp(): Promise<express.Express> {
     const application = express();
-    await configureApp(application);
+    await configureApp(application, knex(buildKnexConfig({ MYSQL_DATABASE: 'fake' })));
     return application;
 }
 

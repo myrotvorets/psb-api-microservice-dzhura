@@ -12,7 +12,7 @@ FROM base AS build
 RUN \
     npm r --package-lock-only \
         eslint @myrotvorets/eslint-config-myrotvorets-ts @typescript-eslint/eslint-plugin eslint-plugin-import eslint-plugin-prettier prettier \
-        @types/jest jest ts-jest merge supertest @types/supertest \
+        @types/jest jest ts-jest merge supertest @types/supertest mock-knex @types/mock-knex \
         nodemon && \
     npm ci
 COPY --chown=nobody:nogroup ./src ./src

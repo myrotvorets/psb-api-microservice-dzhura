@@ -1,8 +1,15 @@
-import SearchService from '../../../src/services/search';
+import mockKnex from 'mock-knex';
+import knex from 'knex';
+import SearchService, { CriminalAttachment } from '../../../src/services/search';
+import { buildKnexConfig } from '../../../src/knexfile';
 
 class MySearchService extends SearchService {
     public static testPrepareName(name: string): string | null {
         return SearchService.prepareName(name);
+    }
+
+    public static testGetThumbnails(atts: readonly CriminalAttachment[]): Record<number, string> {
+        return SearchService.getThumbnails(atts);
     }
 }
 
@@ -45,5 +52,84 @@ describe('SearchService', () => {
         ];
 
         it.each(table3)('should correctly handle names with more than two lexemes (%s => %s)', tester);
+    });
+
+    describe('getThumbnails', () => {
+        it('should insert -150x150 suffix', () => {
+            const input: CriminalAttachment[] = [
+                { id: 1, att_id: 2, path: 'some/file.png', mime_type: 'image/png' },
+                { id: 3, att_id: 4, path: 'another/filename.jpg', mime_type: 'image/jpeg' },
+            ];
+
+            const expected: Record<number, string> = {
+                1: 'some/file-150x150.png',
+                3: 'another/filename-150x150.jpg',
+            };
+
+            expect(MySearchService.testGetThumbnails(input)).toStrictEqual(expected);
+        });
+
+        it('should use the first attachemnt for the criminal', () => {
+            const input: CriminalAttachment[] = [
+                { id: 1, att_id: 2, path: '1.png', mime_type: 'image/png' },
+                { id: 1, att_id: 3, path: '2.jpg', mime_type: 'image/jpeg' },
+            ];
+
+            const expected: Record<number, string> = {
+                1: '1-150x150.png',
+            };
+
+            expect(MySearchService.testGetThumbnails(input)).toStrictEqual(expected);
+        });
+    });
+
+    describe('search', () => {
+        const db = knex(buildKnexConfig({ MYSQL_DATABASE: 'fake' }));
+        beforeEach(() => mockKnex.mock(db));
+        afterEach(() => {
+            mockKnex.getTracker().uninstall();
+            mockKnex.unmock(db);
+        });
+
+        const service = new SearchService(db);
+
+        const table1 = [
+            ['путинхуйло'],
+            ['путин путин'],
+            ['Путин путин'],
+            ['Путин  путин '],
+            ['Путин@ #путин '],
+            ['@@@ ### $$$'],
+        ];
+
+        it.each(table1)('should return null when prepareName returns falsy value (%s)', (name: string) => {
+            return expect(service.search(name)).resolves.toBeNull();
+        });
+
+        it('should return an empty array if there are no matches', () => {
+            const tracker = mockKnex.getTracker();
+            tracker.on('query', (query, step) => {
+                expect(step).toStrictEqual(1);
+                expect(query.method).toBe('select');
+                expect(query.bindings).toHaveLength(4);
+                query.response([]);
+            });
+
+            tracker.install();
+            return expect(service.search('Путин Владимир')).resolves.toEqual([]);
+        });
+
+        it('should return an empty array if there are no matches', () => {
+            const tracker = mockKnex.getTracker();
+            tracker.on('query', (query, step) => {
+                expect(step).toStrictEqual(1);
+                expect(query.method).toBe('select');
+                expect(query.bindings).toHaveLength(4);
+                query.response([]);
+            });
+
+            tracker.install();
+            return expect(service.search('Путин Владимир')).resolves.toEqual([]);
+        });
     });
 });

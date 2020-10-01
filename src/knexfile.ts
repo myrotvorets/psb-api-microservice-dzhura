@@ -1,9 +1,9 @@
 import type { Config } from 'knex';
 import { cleanEnv, num, str } from 'envalid';
 
-export function buildKnexConfig(): Config {
+export function buildKnexConfig(environment: NodeJS.Dict<string> = process.env): Config {
     const env = cleanEnv(
-        process.env,
+        environment,
         {
             NODE_ENV: str({ default: 'development' }),
             MYSQL_DATABASE: str(),
@@ -14,6 +14,7 @@ export function buildKnexConfig(): Config {
         },
         {
             strict: true,
+            dotEnvPath: null,
         },
     );
 

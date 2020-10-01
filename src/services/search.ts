@@ -12,7 +12,7 @@ interface Criminal {
     description: string;
 }
 
-interface CriminalAttachment {
+export interface CriminalAttachment {
     id: number;
     att_id: number;
     path: string;
@@ -126,7 +126,7 @@ export default class SearchService {
             .orderBy(['id', 'sort_order']);
     }
 
-    private static getThumbnails(atts: readonly CriminalAttachment[]): Record<number, string> {
+    protected static getThumbnails(atts: readonly CriminalAttachment[]): Record<number, string> {
         const result: Record<number, string> = {};
 
         for (const { id, path } of atts) {
