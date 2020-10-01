@@ -11,9 +11,9 @@ process.env = {
 };
 
 async function buildApp(): Promise<express.Express> {
-    const app = express();
-    await configureApp(app);
-    return app;
+    const application = express();
+    await configureApp(application);
+    return application;
 }
 
 beforeAll((done) => {
