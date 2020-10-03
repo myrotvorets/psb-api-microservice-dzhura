@@ -17,6 +17,7 @@
   "author": "Myrotvorets <support@myrotvorets.center> (https://myrotvorets.center/)",
   "license": "MIT",
   "dependencies": {
+    "@cloudnative/health-connect": "^2.1.0",
     "@myrotvorets/create-server": "^1.0.2",
     "@myrotvorets/express-async-middleware-wrapper": "^1.0.18",
     "@myrotvorets/express-microservice-middlewares": "^1.2.17",
