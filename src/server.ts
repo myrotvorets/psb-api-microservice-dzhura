@@ -10,6 +10,7 @@ import { buildKnexConfig } from './knexfile';
 import { environment } from './lib/environment';
 
 import searchController from './controllers/search';
+import monitoringController from './controllers/monitoring';
 
 export async function configureApp(app: express.Express, db: knex): Promise<void> {
     const env = environment();
@@ -40,7 +41,11 @@ export function setupApp(): express.Express {
 export async function run(): Promise<void> {
     const env = environment();
     const app = setupApp();
-    await configureApp(app, knex(buildKnexConfig()));
+    const db = knex(buildKnexConfig());
+
+    app.use('/monitoring', monitoringController(db));
+
+    await configureApp(app, db);
 
     const server = await createServer(app);
     server.listen(env.PORT);

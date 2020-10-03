@@ -22,6 +22,8 @@ FROM myrotvorets/node-min
 USER root
 WORKDIR /srv/service
 RUN chown nobody:nogroup /srv/service
+COPY healthcheck.sh /usr/local/bin/
+HEALTHCHECK --interval=60s --timeout=10s --start-period=5s --retries=3 CMD ["/usr/local/bin/healthcheck.sh"]
 USER nobody:nogroup
 ENTRYPOINT ["/usr/bin/node", "index.js"]
 COPY --chown=nobody:nogroup ./src/specs ./specs
