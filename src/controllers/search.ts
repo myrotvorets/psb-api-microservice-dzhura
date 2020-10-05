@@ -4,7 +4,7 @@ import asyncWrapper from '@myrotvorets/express-async-middleware-wrapper';
 import SearchService from '../services/search';
 
 function searchHandler(searchService: SearchService): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    return async function search(req: Request, res: Response, next: NextFunction): Promise<void> {
         const result = await searchService.search(req.query.s as string);
         if (result === null) {
             next({
@@ -22,7 +22,7 @@ function searchHandler(searchService: SearchService): RequestHandler {
     };
 }
 
-export default function (db: knex): Router {
+export default function searchController(db: knex): Router {
     const router = Router();
     const service = new SearchService(db);
 
