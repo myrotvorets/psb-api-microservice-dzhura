@@ -50,6 +50,5 @@ export async function run(): Promise<void> {
 
     await configureApp(app);
 
-    const server = await createServer(app);
-    server.listen(env.PORT);
+    (await createServer(app)).listen(env.PORT);
 }

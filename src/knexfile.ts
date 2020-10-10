@@ -3,8 +3,17 @@
 import type { Config } from 'knex';
 import { cleanEnv, num, str } from 'envalid';
 
-export function buildKnexConfig(environment: NodeJS.Dict<string> = process.env): Config {
-    const env = cleanEnv(
+interface DbEnv {
+    NODE_ENV: string;
+    MYSQL_DATABASE: string;
+    MYSQL_HOST: string;
+    MYSQL_USER: string;
+    MYSQL_PASSWORD: string;
+    MYSQL_CONN_LIMIT: number;
+}
+
+function getEnvironment(environment: NodeJS.Dict<string>): Readonly<DbEnv> {
+    return cleanEnv(
         environment,
         {
             NODE_ENV: str({ default: 'development' }),
@@ -19,6 +28,10 @@ export function buildKnexConfig(environment: NodeJS.Dict<string> = process.env):
             dotEnvPath: null,
         },
     );
+}
+
+export function buildKnexConfig(environment: NodeJS.Dict<string> = process.env): Config {
+    const env = getEnvironment(environment);
 
     return {
         client: 'mysql2',
