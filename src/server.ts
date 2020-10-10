@@ -39,12 +39,15 @@ export function setupApp(): express.Express {
 }
 
 /* istanbul ignore next */
-export async function run(): Promise<void> {
-    const env = environment();
-    const app = setupApp();
+function setupKnex(): knex {
     const db = knex(buildKnexConfig());
-
     Model.knex(db);
+    return db;
+}
+
+/* istanbul ignore next */
+export async function run(): Promise<void> {
+    const [env, app, db] = [environment(), setupApp(), setupKnex()];
 
     app.use('/monitoring', monitoringController(db));
 
