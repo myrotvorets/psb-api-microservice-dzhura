@@ -48,7 +48,7 @@ jobs:
           args: >
             -Dsonar.projectName=${{ steps.ver.outputs.packageName }}
             -Dsonar.projectVersion=${{ steps.ver.outputs.packageVersion }}
-            -Dsonar.links.homepage="${{ steps.ver.outputs.packageHomepage }}"
-            -Dsonar.links.issue="${{ steps.ver.outputs.packageBugsUrl }}"
-            -Dsonar.links.scm="${{ steps.ver.outputs.packageScmUrl }}"
+            -Dsonar.links.homepage=${{ steps.ver.outputs.packageHomepage }}
+            -Dsonar.links.issue=${{ steps.ver.outputs.packageBugsUrl }}
+            -Dsonar.links.scm=${{ steps.ver.outputs.packageScmUrl }}
         if: ${{ matrix.node_version == '12' }}
