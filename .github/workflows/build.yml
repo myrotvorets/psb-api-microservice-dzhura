@@ -18,6 +18,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: true
+          fetch-depth: 0
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v2.1.2
@@ -29,3 +30,10 @@ jobs:
         run: npm cit
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        if: ${{ matrix.node_version == '12' }}
