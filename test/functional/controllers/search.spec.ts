@@ -2,6 +2,7 @@ import express from 'express';
 import request from 'supertest';
 import knex from 'knex';
 import mockKnex from 'mock-knex';
+import { Model } from 'objection';
 import { buildKnexConfig } from '../../../src/knexfile';
 import { configureApp } from '../../../src/server';
 import { attachmentResponse, criminalResponse } from '../../fixtures/queryresponses';
@@ -13,8 +14,9 @@ async function buildApp(): Promise<express.Express> {
     const application = express();
     const db = knex(buildKnexConfig({ MYSQL_DATABASE: 'fake' }));
     mockKnex.mock(db);
+    Model.knex(db);
     afterAll(() => mockKnex.unmock(db));
-    await configureApp(application, db);
+    await configureApp(application);
     return application;
 }
 

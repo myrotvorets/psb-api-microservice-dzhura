@@ -14,7 +14,7 @@ async function buildApp(): Promise<express.Express> {
     mockKnex.mock(db);
     afterAll(() => mockKnex.unmock(db));
     application.use('/monitoring', monitoringController(db));
-    await configureApp(application, db);
+    await configureApp(application);
     return application;
 }
 
