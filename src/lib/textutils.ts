@@ -15,12 +15,10 @@ function replaceCallback(match: string, p1: string, p2: string): string {
 }
 
 export function makeClickable(s: string): string {
-    const ret = ` ${s}`
+    return ` ${s}`
         .replace(/([\s>])(https?:\/\/[\w\x80-\xff#$%&~/.\-;:=,?@[\]+]+)/gisu, replaceCallback)
         .replace(/(<a( [^>]+?>|>))<a [^>]+?>([^>]+?)<\/a><\/a>/giu, '$1$3</a>')
         .trim();
-
-    return ret;
 }
 
 export function autoP(s: string): string {
