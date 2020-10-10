@@ -31,6 +31,10 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
+      - name: Retrieve information from package.json
+        uses: myrotvorets/info-from-package-json-action@0.0.2
+        id: ver
+
       - name: Fix paths in test-report.xml
         run: sed -i "s@$(pwd)@/github/workspace@g" test-report.xml
         if: ${{ matrix.node_version == '12' }}
@@ -40,4 +44,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectName=${{ steps.ver.outputs.packageName }}
+            -Dsonar.projectVersion=${{ steps.ver.outputs.packageVersion }}
+            -Dsonar.projectDescription="${{ steps.ver.outputs.packageDescription }}"
+            -Dsonar.links.homepage="${{ steps.ver.outputs.packageHomepage }}"
+            -Dsonar.links.issue="${{ steps.ver.outputs.packageBugsUrl }}"
+            -Dsonar.links.scm="${{ steps.ver.outputs.packageScmUrl }}"
         if: ${{ matrix.node_version == '12' }}
