@@ -1,9 +1,11 @@
 import mockKnex from 'mock-knex';
 import knex from 'knex';
-import SearchService, { CriminalAttachment } from '../../../src/services/search';
+import { Model } from 'objection';
+import SearchService from '../../../src/services/search';
 import { buildKnexConfig } from '../../../src/knexfile';
 import { attachmentResponse, criminalResponse } from '../../fixtures/queryresponses';
 import { resultItems } from '../../fixtures/results';
+import CriminalAttachment from '../../../src/models/criminalattachment';
 
 class MySearchService extends SearchService {
     public static testPrepareName(name: string): string | null {
@@ -59,8 +61,13 @@ describe('SearchService', () => {
     describe('getThumbnails', () => {
         it('should insert -150x150 suffix', () => {
             const input: CriminalAttachment[] = [
-                { id: 1, att_id: 2, path: 'some/file.png', mime_type: 'image/png' },
-                { id: 3, att_id: 4, path: 'another/filename.jpg', mime_type: 'image/jpeg' },
+                CriminalAttachment.fromJson({ id: 1, att_id: 2, path: 'some/file.png', mime_type: 'image/png' }),
+                CriminalAttachment.fromJson({
+                    id: 3,
+                    att_id: 4,
+                    path: 'another/filename.jpg',
+                    mime_type: 'image/jpeg',
+                }),
             ];
 
             const expected: Record<number, string> = {
@@ -73,8 +80,8 @@ describe('SearchService', () => {
 
         it('should use the first attachemnt for the criminal', () => {
             const input: CriminalAttachment[] = [
-                { id: 1, att_id: 2, path: '1.png', mime_type: 'image/png' },
-                { id: 1, att_id: 3, path: '2.jpg', mime_type: 'image/jpeg' },
+                CriminalAttachment.fromJson({ id: 1, att_id: 2, path: '1.png', mime_type: 'image/png' }),
+                CriminalAttachment.fromJson({ id: 1, att_id: 3, path: '2.jpg', mime_type: 'image/jpeg' }),
             ];
 
             const expected: Record<number, string> = {
@@ -87,13 +94,15 @@ describe('SearchService', () => {
 
     describe('search', () => {
         const db = knex(buildKnexConfig({ MYSQL_DATABASE: 'fake' }));
-        beforeEach(() => mockKnex.mock(db));
+        beforeEach(() => {
+            mockKnex.mock(db);
+            Model.knex(db);
+        });
+
         afterEach(() => {
             mockKnex.getTracker().uninstall();
             mockKnex.unmock(db);
         });
-
-        const service = new SearchService(db);
 
         const table1 = [
             ['путинхуйло'],
@@ -105,7 +114,7 @@ describe('SearchService', () => {
         ];
 
         it.each(table1)('should return null when prepareName returns falsy value (%s)', (name: string) => {
-            return expect(service.search(name)).resolves.toBeNull();
+            return expect(SearchService.search(name)).resolves.toBeNull();
         });
 
         it('should return an empty array if there are no matches', () => {
@@ -118,7 +127,7 @@ describe('SearchService', () => {
             });
 
             tracker.install();
-            return expect(service.search('Путин Владимир')).resolves.toEqual([]);
+            return expect(SearchService.search('Путин Владимир')).resolves.toEqual([]);
         });
 
         it('should return the expected results', () => {
@@ -144,7 +153,7 @@ describe('SearchService', () => {
 
             tracker.install();
             const expected = resultItems;
-            return expect(service.search('Our mock will find everything')).resolves.toEqual(expected);
+            return expect(SearchService.search('Our mock will find everything')).resolves.toEqual(expected);
         });
     });
 });

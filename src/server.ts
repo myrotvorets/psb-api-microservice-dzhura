@@ -1,5 +1,6 @@
 import express from 'express';
 import knex from 'knex';
+import { Model } from 'objection';
 import { join } from 'path';
 import { installOpenApiValidator } from '@myrotvorets/oav-installer';
 import { errorMiddleware, notFoundMiddleware } from '@myrotvorets/express-microservice-middlewares';
@@ -12,12 +13,12 @@ import { environment } from './lib/environment';
 import searchController from './controllers/search';
 import monitoringController from './controllers/monitoring';
 
-export async function configureApp(app: express.Express, db: knex): Promise<void> {
+export async function configureApp(app: express.Express): Promise<void> {
     const env = environment();
 
     await installOpenApiValidator(join(__dirname, 'specs', 'dzhura.yaml'), app, env.NODE_ENV);
 
-    app.use('/', searchController(db));
+    app.use('/', searchController());
     app.use('/', notFoundMiddleware);
     app.use(errorMiddleware);
 }
@@ -38,15 +39,19 @@ export function setupApp(): express.Express {
 }
 
 /* istanbul ignore next */
-export async function run(): Promise<void> {
-    const env = environment();
-    const app = setupApp();
+function setupKnex(): knex {
     const db = knex(buildKnexConfig());
+    Model.knex(db);
+    return db;
+}
+
+/* istanbul ignore next */
+export async function run(): Promise<void> {
+    const [env, app, db] = [environment(), setupApp(), setupKnex()];
 
     app.use('/monitoring', monitoringController(db));
 
-    await configureApp(app, db);
+    await configureApp(app);
 
-    const server = await createServer(app);
-    server.listen(env.PORT);
+    (await createServer(app)).listen(env.PORT);
 }
