@@ -120,10 +120,24 @@ describe('SearchService', () => {
         it('should return an empty array if there are no matches', () => {
             const tracker = mockKnex.getTracker();
             tracker.on('query', (query, step) => {
-                expect(step).toStrictEqual(1);
-                expect(query.method).toBe('select');
-                expect(query.bindings).toHaveLength(4);
-                query.response([]);
+                switch (step) {
+                    case 1: // BEGIN
+                    case 3: // COMMIT
+                        expect(query.transacting).toBe(true);
+                        expect(query.method).toBeUndefined();
+                        query.response([]);
+                        break;
+
+                    case 2:
+                        expect(query.transacting).toBe(true);
+                        expect(query.method).toBe('select');
+                        expect(query.bindings).toHaveLength(4);
+                        query.response([]);
+                        break;
+
+                    default:
+                        fail();
+                }
             });
 
             tracker.install();
@@ -134,13 +148,22 @@ describe('SearchService', () => {
             const tracker = mockKnex.getTracker();
             tracker.on('query', (query, step) => {
                 switch (step) {
-                    case 1:
+                    case 1: // BEGIN
+                    case 4: // COMMIT
+                        expect(query.transacting).toBe(true);
+                        expect(query.method).toBeUndefined();
+                        query.response([]);
+                        break;
+
+                    case 2:
+                        expect(query.transacting).toBe(true);
                         expect(query.method).toBe('select');
                         expect(query.bindings).toHaveLength(4);
                         query.response(criminalResponse);
                         break;
 
-                    case 2:
+                    case 3:
+                        expect(query.transacting).toBe(true);
                         expect(query.method).toBe('select');
                         expect(query.bindings).toHaveLength(3);
                         query.response(attachmentResponse);
@@ -152,8 +175,7 @@ describe('SearchService', () => {
             });
 
             tracker.install();
-            const expected = resultItems;
-            return expect(SearchService.search('Our mock will find everything')).resolves.toEqual(expected);
+            return expect(SearchService.search('Our mock will find everything')).resolves.toEqual(resultItems);
         });
     });
 });

@@ -1,3 +1,4 @@
+import { Model } from 'objection';
 import { autoP, makeClickable } from '../lib/textutils';
 import Criminal from '../models/criminal';
 import CriminalAttachment from '../models/criminalattachment';
@@ -21,20 +22,23 @@ export default class SearchService {
             return null;
         }
 
-        const criminalsQuery = Criminal.query();
-        const rows = await criminalsQuery.modify('searchByName', n, 10);
+        const [rows, atts] = await Model.transaction(async (trx) => {
+            const rows = await Criminal.query(trx).modify('searchByName', n, 10);
+            if (!rows.length) {
+                return [null, null];
+            }
 
-        if (!rows.length) {
-            return [];
+            const ids = rows.map((x) => x.id);
+            const atts = await CriminalAttachment.query(trx).modify('findByIds', ids);
+            return [rows, atts];
+        });
+
+        if (rows) {
+            const thumbs = SearchService.getThumbnails(atts as CriminalAttachment[]);
+            return SearchService.prepareResult(rows, thumbs);
         }
 
-        const ids = rows.map((x) => x.id);
-
-        const criminalAttchmentsQuery = CriminalAttachment.query();
-        const atts = await criminalAttchmentsQuery.modify('findByIds', ids);
-        const thumbs = SearchService.getThumbnails(atts);
-
-        return SearchService.prepareResult(rows, thumbs);
+        return [];
     }
 
     private static prepareResult(criminals: Criminal[], thumbs: Record<number, string>): SearchItem[] {
@@ -89,14 +93,12 @@ export default class SearchService {
     }
 
     protected static getThumbnails(atts: readonly CriminalAttachment[]): Record<number, string> {
-        const result: Record<number, string> = {};
-
-        for (const { id, path } of atts) {
+        return atts.reduce<Record<number, string>>((result, { id, path }) => {
             if (result[id] === undefined) {
                 result[id] = path.replace(/(\.[a-z]+)$/u, '-150x150$1');
             }
-        }
 
-        return result;
+            return result;
+        }, {});
     }
 }
