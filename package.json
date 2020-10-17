@@ -22,7 +22,7 @@
     "@myrotvorets/express-async-middleware-wrapper": "^1.0.19",
     "@myrotvorets/express-microservice-middlewares": "^1.3.0",
     "@myrotvorets/oav-installer": "^2.1.2",
-    "@opentelemetry/api": "^0.11.0",
+    "@myrotvorets/opentelemetry-plugin-knex": "^0.2.2",
     "@opentelemetry/exporter-zipkin": "^0.11.0",
     "@opentelemetry/node": "^0.11.0",
     "@opentelemetry/plugin-express": "^0.10.0",
