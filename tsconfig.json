@@ -4,6 +4,7 @@
         "module": "CommonJS",
         "noEmitOnError": true,
         "outDir": "./dist",
+        "rootDirs": ["src", "test"],
         "sourceMap": false,
         "declaration": true,
         "removeComments": true,
@@ -17,6 +18,5 @@
             "./node_modules/@types/"
         ]
     },
-    "compileOnSave": true,
-    "include": ["src/**/*.ts", "test/**/*.ts"]
+    "compileOnSave": true
 }
