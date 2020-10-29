@@ -1,6 +1,6 @@
 {
   "name": "psbapi-microservice-dzhura",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "private": true,
   "description": "Dzhura integration microservice",
   "main": "index.js",
