@@ -22,16 +22,7 @@ async function buildApp(): Promise<express.Express> {
 
 afterEach(() => mockKnex.getTracker().uninstall());
 
-beforeAll((done) => {
-    buildApp()
-        .then((application) => {
-            app = application;
-            done();
-        })
-        .catch((e: Error) => {
-            done.fail(e);
-        });
-});
+beforeAll(() => buildApp().then((application) => (app = application)));
 
 describe('SearchController', () => {
     describe('Error Handling', () => {
@@ -87,7 +78,7 @@ describe('SearchController', () => {
             const tracker = mockKnex.getTracker();
             tracker.on('query', (query, step) => {
                 const responses = [[], criminalResponse, attachmentResponse, []];
-                query.response(responses[step - 1] ?? fail());
+                query.response(responses[step - 1]);
             });
 
             const expected = {

@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-conditional-expect */
 import mockKnex from 'mock-knex';
 import knex from 'knex';
 import { Model } from 'objection';
@@ -136,7 +137,7 @@ describe('SearchService', () => {
                         break;
 
                     default:
-                        fail();
+                        throw new Error('UNEXPECTED');
                 }
             });
 
@@ -170,7 +171,7 @@ describe('SearchService', () => {
                         break;
 
                     default:
-                        fail();
+                        throw new Error('UNEXPECTED');
                 }
             });
 
