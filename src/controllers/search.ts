@@ -1,4 +1,4 @@
-import { NextFunction, Request, RequestHandler, Response, Router } from 'express';
+import { NextFunction, Request, Response, Router } from 'express';
 import asyncWrapper from '@myrotvorets/express-async-middleware-wrapper';
 import SearchService from '../services/search';
 
@@ -21,6 +21,6 @@ async function searchHandler(req: Request, res: Response, next: NextFunction): P
 
 export default function searchController(): Router {
     const router = Router();
-    router.get('/search', asyncWrapper(searchHandler as RequestHandler));
+    router.get('/search', asyncWrapper(searchHandler));
     return router;
 }
