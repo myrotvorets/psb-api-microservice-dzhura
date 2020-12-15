@@ -23,14 +23,14 @@ export default class SearchService {
         }
 
         const [rows, atts] = await Model.transaction(async (trx) => {
-            const rows = await Criminal.query(trx).modify('searchByName', n, 10);
-            if (!rows.length) {
+            const criminals = await Criminal.query(trx).modify('searchByName', n, 10);
+            if (!criminals.length) {
                 return [null, null];
             }
 
-            const ids = rows.map((x) => x.id);
-            const atts = await CriminalAttachment.query(trx).modify('findByIds', ids);
-            return [rows, atts];
+            const ids = criminals.map((x) => x.id);
+            const attachments = await CriminalAttachment.query(trx).modify('findByIds', ids);
+            return [criminals, attachments];
         });
 
         if (rows) {
