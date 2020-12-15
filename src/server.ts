@@ -29,11 +29,13 @@ export function setupApp(): express.Express {
     app.set('strict routing', true);
     app.set('x-powered-by', false);
 
-    app.use(
-        morgan(
-            '[PSBAPI-dzhura] :req[X-Request-ID]\t:method\t:url\t:status :res[content-length]\t:date[iso]\t:response-time\t:total-time',
-        ),
-    );
+    if (process.env.SKIP_REQUEST_LOGGING !== '1') {
+        app.use(
+            morgan(
+                '[PSBAPI-dzhura] :req[X-Request-ID]\t:method\t:url\t:status :res[content-length]\t:date[iso]\t:response-time\t:total-time',
+            ),
+        );
+    }
 
     return app;
 }

@@ -1,0 +1,18 @@
+@reallyslow
+Feature: Test for SQL injection attacks
+
+    Scenario: Make sure /search endpoint is not vulnerable to SQLi
+        Given "sqlmap" is installed
+        And the following profile:
+            | name        | value                         |
+            | target_url  | http://dzhura:3000/search?s=* |
+
+        When I launch a "sqlmap" attack with:
+            """
+            python <sqlmap_path> -u <target_url> --batch --dbms mysql --os Linux -p s --level=5 --risk=3 --null-connection --skip="user-agent,referer,cookie"
+            """
+
+        Then the output should contain:
+            """
+            all tested parameters do not appear to be injectable
+            """
