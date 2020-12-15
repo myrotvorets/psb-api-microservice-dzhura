@@ -1,0 +1,44 @@
+version: '3.0'
+
+services:
+  dzhura:
+    image: node:current-alpine
+    read_only: true
+    volumes:
+      - ".:/usr/src/service"
+    working_dir: /usr/src/service
+    entrypoint: npm run scan
+    environment:
+      NODE_ENV: test
+      SEED_TABLES: "yes"
+      SKIP_REQUEST_LOGGING: "1"
+      NO_UPDATE_NOTIFIER: "true"
+      MYSQL_DATABASE: test
+      MYSQL_HOST: mysql
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mariadb:latest
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_DATABASE: test
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+      MYSQL_INITDB_SKIP_TZINFO: "1"
+    volumes:
+      - mysql_data
+
+  gauntlt:
+    image: gauntlt/gauntlt
+    volumes:
+      - .:/working
+    working_dir: /working
+    entrypoint: /working/.docker/gauntlt.sh
+    depends_on:
+      - dzhura
+
+volumes:
+  mysql_data:

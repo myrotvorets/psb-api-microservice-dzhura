@@ -27,4 +27,4 @@ if (+(process.env.ENABLE_TRACING || 0) && process.env.ZIPKIN_ENDPOINT) {
 }
 
 provider.register();
-EventEmitter.defaultMaxListeners = 100;
+EventEmitter.defaultMaxListeners = 12;
