@@ -95,8 +95,6 @@ jobs:
       - name: Fix paths in test-report.xml
         run: sed -i "s@$(pwd)@/github/workspace@g" test-report.xml
 
-      - run: ls -lhaR
-
       - name: Retrieve information from package.json
         uses: myrotvorets/info-from-package-json-action@1.0.3
         id: ver
