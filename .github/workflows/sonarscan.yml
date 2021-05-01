@@ -79,3 +79,14 @@ jobs:
             -Dsonar.links.homepage=${{ steps.ver.outputs.packageHomepage }}
             -Dsonar.links.issue=${{ steps.ver.outputs.packageBugsUrl }}
             -Dsonar.links.scm=${{ steps.ver.outputs.packageScmUrl }}
+
+      - name: Install codecov
+        run: npm i -g codecov
+
+      - name: Rebuild the project with sourcemaps
+        run: npm run build -- --sourcemap
+
+      - name: Run codecov
+        run: codecov
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
