@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Check out the code
         uses: actions/checkout@v2
+        with:
+          submodules: true
 
       - name: Set up Node.js environment
         uses: actions/setup-node@v2.1.5
