@@ -9,19 +9,20 @@ import { attachmentResponse, criminalResponse } from '../../fixtures/queryrespon
 import { resultItems } from '../../fixtures/results';
 
 let app: express.Express;
+let db: knex;
 
 async function buildApp(): Promise<express.Express> {
     const application = express();
-    const db = knex(buildKnexConfig({ MYSQL_DATABASE: 'fake' }));
+    db = knex(buildKnexConfig({ MYSQL_DATABASE: 'fake' }));
     mockKnex.mock(db);
     Model.knex(db);
-    afterAll(() => mockKnex.unmock(db));
+
     await configureApp(application);
     return application;
 }
 
+afterAll(() => mockKnex.unmock(db));
 afterEach(() => mockKnex.getTracker().uninstall());
-
 beforeAll(() => buildApp().then((application) => (app = application)));
 
 describe('SearchController', () => {
